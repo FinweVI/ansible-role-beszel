@@ -1,0 +1,35 @@
+---
+- name: Download Beszel binary hub tarball
+  ansible.builtin.get_url:
+    url: |
+      {% if beszel_version == 'latest' %}
+        https://github.com/henrygd/beszel/releases/{{ beszel_version }}/download/beszel_linux_{{ beszel_architecture | trim }}.tar.gz
+      {% else %}
+        https://github.com/henrygd/beszel/releases/download/{{ beszel_version }}/beszel_linux_{{ beszel_architecture | trim }}.tar.gz
+      {% endif %}
+    dest: /tmp/beszel-hub.tar.gz
+    force: true
+    mode: u=rw,g=,o=
+
+- name: Extract Beszel binary hub tarball
+  ansible.builtin.unarchive:
+    src: /tmp/beszel-hub.tar.gz
+    dest: "{{ beszel_hub_install_dir }}"
+    mode: u=rwx,g=rx,o=rx
+    remote_src: true
+  notify: Restart Beszel binary hub systemd service
+
+- name: Install Beszel binary hub systemd service
+  ansible.builtin.template:
+    src: beszel-hub.service.j2
+    dest: /etc/systemd/system/beszel-hub.service
+    mode: u=rw,g=r,o=r
+  notify:
+    - Reload systemd configuration
+    - Restart Beszel binary hub systemd service
+
+- name: Start the Beszel binary hub systemd service
+  ansible.builtin.service:
+    name: beszel-hub
+    enabled: "{{ beszel_hub_service_enabled }}"
+    state: "{{ beszel_hub_service_state }}"

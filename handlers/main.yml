@@ -6,5 +6,10 @@
 
 - name: Restart Beszel binary agent systemd service
   ansible.builtin.service:
-    name: beszel-agent
+   name: beszel-agent
+   state: restarted
+
+- name: Restart Beszel binary hub systemd service
+  ansible.builtin.service:
+    name: beszel-hub
     state: restarted

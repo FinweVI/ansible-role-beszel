@@ -5,9 +5,9 @@ Wants=network-online.target
 
 [Service]
 User={{ beszel_user }}
-ExecStart={{ beszel_install_dir }}/beszel-agent {{ beszel_args | trim }}
-Environment="PORT={{ beszel_port }}"
-Environment="KEY={{ beszel_public_key }}"
+ExecStart={{ beszel_agent_install_dir }}/beszel-agent {{ beszel_agent_args | trim }}
+Environment="PORT={{ beszel_agent_port }}"
+Environment="KEY={{ beszel_public_key if beszel_public_key else local_public_key }}"
 {% if beszel_extra_filesystems %}
 Environment="EXTRA_FILESYSTEMS={{ beszel_extra_filesystems | join(',') }}"
 {% endif %}

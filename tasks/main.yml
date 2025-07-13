@@ -1,9 +1,40 @@
 ---
-# tasks file for dbrennand.beszel
-- name: Assert | beszel_state
-  ansible.builtin.assert:
-    that: beszel_state in _beszel_states
+- name: Determine Beszel binary agent architecture
+  ansible.builtin.set_fact:
+    beszel_architecture: >-
+      {% if ansible_architecture == 'x86_64' %}
+        amd64
+      {% elif ansible_architecture == 'aarch64' %}
+        arm64
+      {% elif ansible_architecture == 'armv6l' %}
+        arm
+      {% elif ansible_architecture == 'armv7l' %}
+        arm
+      {% endif %}
 
-- name: Include state tasks
+- name: Ensure base-packages are installed
+  ansible.builtin.apt:
+    pkg:
+      - curl
+      - tar
+
+- name: Create user for Beszel
+  ansible.builtin.user:
+    name: "{{ beszel_user }}"
+    shell: /sbin/nologin
+    state: present
+    system: true
+
+- name: Include hub tasks
   ansible.builtin.import_tasks:
-    file: "beszel_{{ beszel_state }}.yml"
+    file: "hub.yml"
+  tags:
+    - beszel-hub
+  when: beszel_hub_install
+
+- name: Include agent tasks
+  ansible.builtin.import_tasks:
+    file: "agent.yml"
+  tags:
+    - beszel-agent
+  when: beszel_agent_install
