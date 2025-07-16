@@ -5,6 +5,9 @@ After=network.target
 [Service]
 ExecStart={{ beszel_hub_install_dir }}/beszel serve --http "0.0.0.0:{{ beszel_hub_port }}" {{ beszel_hub_args | trim }}
 WorkingDirectory={{ beszel_hub_install_dir }}
+{% for k, v in beszel_hub_extra_env.items() -%}
+  Environment="{{ k }}={{ v }}"
+{% endfor %}
 User={{ beszel_user }}
 Restart=on-failure
 RestartSec=5

@@ -36,3 +36,5 @@ beszel_hub_args: ""
 beszel_hub_service_enabled: true
 # State of the Beszel binary hub systemd service
 beszel_hub_service_state: started
+# Extra Env Vars to pass to the Beszel binary hub systemd service
+beszel_hub_extra_env: {}
